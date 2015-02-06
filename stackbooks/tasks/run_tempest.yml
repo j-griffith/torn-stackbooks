@@ -1,0 +1,22 @@
+- hosts: devstack_instance
+  tasks:
+
+  - name: Attempt to get commit hash
+    sudo: no
+    shell: echo cinder_commit_id `git rev-parse --short HEAD` > /opt/stack/tempest/console.log.out
+    args:
+      chdir: /opt/stack/cinder
+    ignore_errors: True
+
+  - name: Retry get commit hash
+    sudo: no
+    shell: echo cinder_commit_id `git rev-parse --short HEAD` > /opt/stack/tempest/console.log.out
+    args:
+      chdir: /opt/stack/cinder
+    ignore_errors: True
+
+  - name: run tempest
+    sudo: no
+    shell: tools/pretty_tox.sh volume | tee -a console.log.out
+    args:
+      chdir: /opt/stack/tempest

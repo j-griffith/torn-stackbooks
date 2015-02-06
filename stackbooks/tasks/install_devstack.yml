@@ -1,0 +1,32 @@
+- hosts: devstack_instance
+  sudo: yes
+  tasks:
+    - name: Configure APT cache
+      template: >
+          src={{ TEMPLATE_DIR }}/01proxy.j2
+          dest=/etc/apt/apt.conf.d/01proxy
+          owner=root group=root mode=644
+
+    - name: Install git and vim
+      sudo: yes
+      apt: pkg={{ item }} state=present
+      with_items:
+        - git
+        - vim
+
+    - name: Clone devstack
+      sudo: no
+      shell: git clone https://github.com/openstack-dev/devstack
+
+    - name: Send over local.conf
+      sudo: no
+      template: src={{ LOCAL_CONF }} dest=~/devstack/local.conf
+
+    - name: Modify Cinder branch in Conf file
+      lineinfile: dest=/home/ubuntu/devstack/local.conf regexp=^CINDER_BRANCH= line=CINDER_BRANCH={{ patchset_ref }}
+
+    - name: Run stack.sh
+      sudo: no
+      shell: ./stack.sh >> stack.sh.out 2>&1
+      args:
+        chdir: ~/devstack

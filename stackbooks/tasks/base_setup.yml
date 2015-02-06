@@ -1,0 +1,12 @@
+- hosts: localhost
+  gather_facts: false
+  sudo: yes
+
+- hosts: devstack_instances
+  tasks:
+  - name: install pkgs
+    sudo: yes
+    apt: pkg={{ item }} state=present
+    with_items:
+      - git
+      - vim

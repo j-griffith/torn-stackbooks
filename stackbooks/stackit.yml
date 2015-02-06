@@ -1,0 +1,12 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - include: tasks/boot_openstack_instance.yml
+    - name: Add to devstack group
+      add_host: hostname={{ openstack_instance['private_ip'] }} groupname=devstack_instance
+
+    - name: Add to sfstack group
+      add_host: hostname={{ openstack_instance['private_ip'] }} groupname=sf_stack
+
+- include: tasks/install_devstack.yml

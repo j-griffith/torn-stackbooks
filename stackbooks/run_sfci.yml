@@ -1,0 +1,3 @@
+- include: stackit.yml
+- include: tasks/run_tempest.yml
+- include: tasks/cleanup_ci.yml

@@ -1,0 +1,24 @@
+- nova_compute:
+    state: present
+    login_username: "{{ openstack_username }}"
+    login_password: "{{ openstack_password }}"
+    login_tenant_name: "{{ openstack_tenantname }}"
+    auth_url: "{{ openstack_auth_url }}"
+    image_id: "{{ openstack_image_id }}"
+    key_name: "{{ openstack_keyname }}"
+    flavor_id: "{{ openstack_flavor_id }}"
+    name: "{{ instance_name }}"
+  register: openstack_instance
+
+- name: Add to instance groups
+  add_host: hostname={{ openstack_instance['private_ip'] }} groupname=openstack_instance
+
+- name: Wait for ssh ready
+  wait_for:
+    port: 22
+    host: "{{ openstack_instance['private_ip'] }}"
+    timeout: 120
+    state: started
+
+- name: pause for 30 seconds
+  pause: seconds=30
